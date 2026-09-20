@@ -1,0 +1,44 @@
+import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
+
+const BUBBLES = Array.from({length: 14}).map((_, i) => ({
+  x: (i * 137) % 100,
+  size: 4 + (i % 5) * 3,
+  speed: 0.4 + (i % 4) * 0.15,
+  delay: i * 12,
+}));
+
+export const AbyssOverlay: React.FC = () => {
+  const frame = useCurrentFrame();
+  const {height} = useVideoConfig();
+
+  return (
+    <AbsoluteFill style={{pointerEvents: 'none'}}>
+      <AbsoluteFill
+        style={{
+          background:
+            'radial-gradient(ellipse at center, rgba(0,20,40,0) 40%, rgba(0,10,25,0.65) 100%)',
+        }}
+      />
+      {BUBBLES.map((b, i) => {
+        const localFrame = (frame + b.delay) % 260;
+        const y = height - (localFrame * b.speed * 3) % (height + 60);
+        const opacity = Math.max(0, 0.5 - (y / height) * 0.3);
+        return (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              left: `${b.x}%`,
+              top: y,
+              width: b.size,
+              height: b.size,
+              borderRadius: '50%',
+              background: 'rgba(180,220,255,0.35)',
+              opacity,
+            }}
+          />
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
